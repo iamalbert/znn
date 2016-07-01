@@ -43,7 +43,7 @@ Note that the size of second dimension of `inputs` must be consistent in a mini-
 ```lua
 znn.TakeLastFrom([offset=0])
 ```
-This module accepts a `TxNxD` tensor and another `T` tensor, output the vector of last time step of each sequence in the minibatch. The size of the output is thus `TxD`
+This module accepts a `TxNxD` tensor and a "length tensor" of size `T`, then output the vectors of last time step of each sequence in the minibatch. The size of the output is thus `NxD`.
 
 Example:
 
