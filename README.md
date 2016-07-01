@@ -24,9 +24,11 @@ znn.SeqPadding( [value=0, [batchfirst=false]])
 ```
 Accept a table of tensors {`T_1 x D`, `T_2 x D`, `T_3 x D`, ..., `T_N xD`}, output a tensor `A` of the size `T x N x D`, where `T` is the maximum of `T_1`, `T_2`, ...
 ```lua
-A[t][b][k] = { inputs[b][t][k]       if 1<= t <= inputs[b]:size(1)
-             { value                 if     t >  inputs[b]:size(1)
+A[t][n][k] = { inputs[n][t][k]       if 1<= t <= inputs[n]:size(1)
+             { value                 if     t >  inputs[n]:size(1)
 ```
+for ` 1 <= t <= T, 1<= n <= N, 1 <= k <= D`
+
 Example:
 ```lua
 local m = znn.SeqPadding()
@@ -44,8 +46,11 @@ znn.SeqBatchLength()
 ```
 Accept a table of tensors {`T_1 x D`, `T_2 x D`, `T_3 x D`, ..., `T_N xD`}, output a tensor `L` recording the lengths of these tensor: 
 ```lua
-L[b] = inputs[b]:size(1)
+L[n] = inputs[n]:size(1)
 ```
+for ` 1<= n <= N`
+
+
 Example:
 ```lua
 local m = znn.SeqBatchLength()
