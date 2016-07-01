@@ -4,7 +4,8 @@ znn = {
 
 local files = {
     'SeqBatchLength',
-    'SeqPadding'
+    'SeqPadding',
+    'SeqTakeLast'
 }
 
 for _, file in ipairs(files) do
