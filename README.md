@@ -82,10 +82,12 @@ Here we use the LSTM implemented in [cudnn.torch](https://github.com/soumith/cud
 The above example is more clear if we writing using `nngraph`:
 ```lua
 local create_model = function(inDim, outDim)
-  local input = - nn.Identity()
-  local seq = input - znn.PadToLongest() - cudnn.LSTM( inDim, outDim )
-  local seqLen  = SeqBatchLength
+
+  local input   = - nn.Identity()
+  local seq     = input - znn.PadToLongest() - cudnn.LSTM( inDim, outDim )
+  local seqLen  = input - znn.SeqBatchLength()
   local seqRepr = { seq, seqLen } -  znn.SeqTakeLast()
+  
   return nn.gModule( {input}, {seqRepr} )
 end
 
