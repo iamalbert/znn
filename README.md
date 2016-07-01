@@ -17,7 +17,7 @@ git clone https://github.com/iamalbert/znn.git && cd znn && luarocks make
 
 ### SeqPadding
 ```lua
-znn.PadToLongest( [value=0, [batchfirst=false]])
+znn.SeqPadding( [value=0, [batchfirst=false]])
 ```
 Accept a table of tensors {`T_1 x D`, `T_2 x D`, `T_3 x D`, ..., `T_N xD`}, output a tensor `A` of the size `T x N x D`, where `T` is the maximum of `T_1`, `T_2`, ...
 ```lua
@@ -26,7 +26,7 @@ A[t][b][k] = { inputs[b][t][k]       if 1<= t <= inputs[b]:size(1)
 ```
 Example:
 ```lua
-local m = znn.PadToLongest()
+local m = znn.SeqPadding()
 local inputs = { torch.rand(4, 5),  torch.rand(7, 5), torch.rand(6, 5) }
 local output = m:forward(inputs)
 ```
@@ -66,7 +66,7 @@ Example:
 local m = nn.Sequential()
   :add( nn.ConcatTable()
     :add( nn.Sequential()
-       :add( znn.PadToLongest() )
+       :add( znn.SeqPadding() )
        :add( cudnn.LSTM( 5, 10 ) )
     )
     :add( nn.SeqBatchLength() )
@@ -84,7 +84,7 @@ The above example is more clear if we writing using `nngraph`:
 local create_model = function(inDim, outDim)
 
   local input   = - nn.Identity()
-  local seq     = input - znn.PadToLongest() - cudnn.LSTM( inDim, outDim )
+  local seq     = input - znn.SeqPadding() - cudnn.LSTM( inDim, outDim )
   local seqLen  = input - znn.SeqBatchLength()
   local seqRepr = { seq, seqLen } -  znn.SeqTakeLast()
   
