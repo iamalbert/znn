@@ -71,10 +71,25 @@ local m = nn.Sequential()
     )
     :add( nn.SeqBatchLength() )
   )
-  :add( znn.TakeLastFrom() )
+  :add( znn.SeqTakeLast() )
   
 local inputs = { torch.rand(4, 5),  torch.rand(7, 5), torch.rand(6, 5) }
 local output = m:forward(inputs) -- a tensor of size 3x10, the last time step of each sequence in inputs.
 ```
 
 Here we use the LSTM implemented in [cudnn.torch](https://github.com/soumith/cudnn.torch), you can replace it with `nn.SeqLSTM` from [rnn](https://github.com/Element-Research/rnn#rnn.SeqLSTM)
+
+The above example is more clear if we writing using `nngraph`:
+```lua
+local create_model = function(inDim, outDim)
+  local input = - nn.Identity()
+  local seq = input - znn.PadToLongest() - cudnn.LSTM( inDim, outDim )
+  local seqLen  = SeqBatchLength
+  local seqRepr = { seq, seqLen } -  znn.SeqTakeLast()
+  return nn.gModule( {input}, {seqRepr} )
+end
+
+local m = create_model(5, 10)
+local inputs = { torch.rand(4, 5),  torch.rand(7, 5), torch.rand(6, 5) }
+local output = m:forward(inputs) -- a tensor of size 3x10, the last time step of each sequence in inputs.
+```
