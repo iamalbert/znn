@@ -2,7 +2,10 @@
 my extension to torch7, totally experimental and unstable
 
 ## Installation
+Using luarocks
+```
 git clone https://github.com/iamalbert/znn.git && cd znn && luarocks make
+```
 
 ## Modules
 * RNN Utitlies
