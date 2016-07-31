@@ -1,4 +1,4 @@
-local SeqTakeLast, Module = torch.class('SeqTakeLast', 'nn.Module')
+local SeqTakeLast, Module = torch.class('znn.SeqTakeLast', 'nn.Module')
 
 function SeqTakeLast:__init(batchfirst)
     Module.__init(self)

@@ -1,4 +1,4 @@
-local SeqPadding, Module = torch.class('znn.SeqSeqPadding', 'nn.Module')
+local SeqPadding, Module = torch.class('znn.SeqPadding', 'nn.Module')
 
 function SeqPadding:__init(value, batchfirst)
     Module.__init(self)
