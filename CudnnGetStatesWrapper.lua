@@ -29,8 +29,8 @@ function CudnnGetStatesWrapper:updateGradInput(input, gradOutput)
 
     -- buffer[ input:size(1) ]:copy(gradOutput[1])
 
-    rnn.gradHiddenOutput = gradOutput[2]
-    rnn.gradCellOutput   = gradOutput[3]
+    rnn.gradHiddenOutput = gradOutput[1]
+    rnn.gradCellOutput   = gradOutput[2]
 
     self.gradInput = rnn:backward(input, buffer)
 
