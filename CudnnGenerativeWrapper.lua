@@ -18,6 +18,7 @@ function CudnnGenerativeWrapper:__init( rnn, generateLen )
     self:reset()
 
     self.gradInput = {}
+    self:training()
 end
 
 function CudnnGenerativeWrapper:reset(stdv)
@@ -67,18 +68,20 @@ function CudnnGenerativeWrapper:updateOutput(input)
         local pred = rnn:forward( inputCurr )
 
         output:select(1,t):copy(pred)
-
+        --[[
         self.hidden[t] = rnn.hiddenOutput:clone()
         self.cell[t]   = rnn.cellOutput:clone()
+        --]]
 
         inputCurr = output:narrow(1, t, 1)
     end
 
     rnn.rememberStates = false
-    --[[
-    rnn.hiddenInput = self.hidden[0]
-    rnn.cellInput   = self.cell[0]
-    rnn:forward( self.buffer:narrow(1, 1, generateLen) )
+    if self.train then
+        rnn.hiddenInput = self.hidden[0]
+        rnn.cellInput   = self.cell[0]
+        rnn:forward( self.buffer:narrow(1, 1, generateLen) )
+    end
     --]]
 
     return self.output
@@ -91,6 +94,7 @@ function CudnnGenerativeWrapper:backward(input, gradOutput)
     local generateLen = self.generateLen
     local gradFirst
 
+    --[[
     for t = generateLen, 1, -1 do
 
         rnn.output:copy( self.output:narrow(1,t,1) )
@@ -104,7 +108,8 @@ function CudnnGenerativeWrapper:backward(input, gradOutput)
     end
     --]]
 
-    --[[
+    rnn.hiddenInput = self.hidden[0]
+    rnn.cellInput   = self.cell[0]
     gradFirst = rnn:backward( self.buffer:narrow(1, 1, generateLen), gradOutput )
     --]]
     
