@@ -45,9 +45,9 @@ function SeqPadding:updateOutput(input)
     for i=1, #input do
         local seq = input[i]
         if self.batchfirst then
-            output:sub( 1, seq:size(1), i, i):copy(seq)
-        else
             output:sub( i, i, 1, seq:size(1)):copy(seq)
+        else
+            output:sub( 1, seq:size(1), i, i):copy(seq)
         end
     end
 

@@ -28,6 +28,8 @@ function SeqBatchLength:updateOutput(input)
         output:long()
     end
 
+    output:resize(  #input )
+
     for i=1, #input do
         assert( input[i]:size(dim) == input[i]:size(dim),
             "inconsistent dimension within batch" )
