@@ -114,6 +114,8 @@ function CudnnGenerativeWrapper:backward(input, gradOutput)
     assert( hiddenSize == initHidden:size(3), "incorrect input hidden size")
     assert( numLayers  == initHidden:size(1), "initHidden should be numLayers x batch x hiddenSize")
 
+    rnn.gradHiddenOutput = nil
+    rnn.gradCellOutput   = nil
     for t = generateLen, 1, -1 do
 
         rnn.output:copy( self.output:narrow(1,t,1) )
@@ -121,11 +123,10 @@ function CudnnGenerativeWrapper:backward(input, gradOutput)
         rnn.cellInput   = self.cell[t-1]
         rnn.reserve:copy(self.reserved[t])
 
-        rnn:backward(
-            self.inputBuffer:narrow(1, t,1),
-            self.output:narrow(1, t, 1)
+        local gI = rnn:backward(
+            self.inputBuffer:narrow(1, t, 1),
+            gradOutput:narrow(1, t, 1)
         )
-
         rnn.gradHiddenOutput = rnn.gradHiddenInput:clone()
         rnn.gradCellOutput   = rnn.gradCellInput:clone()
     end
@@ -137,8 +138,8 @@ function CudnnGenerativeWrapper:backward(input, gradOutput)
     gradFirst = rnn:backward( self.InputBuffer:narrow(1, 1, generateLen), gradOutput )
     --]]
 
-    self.gradInput[1] = rnn.gradHiddenOutput
-    self.gradInput[2] = initCell and rnn.gradCellOutput
+    self.gradInput[1] = rnn.gradHiddenInput
+    self.gradInput[2] = initCell and rnn.gradCellInput
 
     return self.gradInput
 end
