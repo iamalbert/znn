@@ -22,21 +22,21 @@ local function getInputs(input)
         return input, nil, nil
     elseif type(input) == "table" then
         if #input == 2 then
-            return input[1], input[2], nil
+            return input[2], input[1], nil
         elseif #input == 3 then
-            return input[1], input[2], input[3]
+            return input[3], input[2], input[1]
         end
     end
-    error "input shall be inputSeq or {inputSeq, initHidden}, or {inputSeq, initHidden, initCell}"
+    error "input shall be inputSeq or {initHidden,inputSeq}, or {initCell,initHidden,inputSeq}"
 end
 
 local function setOutputs(seq, hid, cell)
     assert( seq, "seq cannot be nil")
     if hid then
         if cell then
-            return {seq, hid, cell}
+            return {cell, hid, seq}
         else
-            return {seq, hid}
+            return {hid, seq}
         end
     else
         return seq
@@ -74,6 +74,8 @@ function CudnnRNN:updateGradInput(input, gradOutput)
     local inputSeq, initHidden, initCell = getInputs(input)
     local gradOutputSeq, gradHidden, gradCell = getInputs(gradOutput)
 
+    local rnn = self.rnn
+
 
     rnn.hiddenInput = initHidden
     rnn.initCell    = initCell
@@ -85,8 +87,8 @@ function CudnnRNN:updateGradInput(input, gradOutput)
 
     self.gradInput = setOutputs( 
         gradInputSeq, 
-        rnn.gradHiddenInput:clone(), 
-        rnn.gradCellInput:clone() 
+        initHidden and rnn.gradHiddenInput:clone(), 
+        initCell   and rnn.gradCellInput:clone() 
     )
 
     return self.gradInput
@@ -97,6 +99,8 @@ function CudnnRNN:accGradParameters(input, gradOutput, scale)
     local inputSeq, initHidden, initCell = getInputs(input)
     local gradOutputSeq, gradHidden, gradCell = getInputs(gradOutput)
 
+
+    local rnn = self.rnn
 
     rnn.hiddenInput = initHidden
     rnn.initCell    = initCell

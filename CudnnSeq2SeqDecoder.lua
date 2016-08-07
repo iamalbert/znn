@@ -1,13 +1,12 @@
-local CudnnSeq2SeqDecoder, Parent = torch.class('znn.CudnnSeq2SeqDecoder', 'nn.Module')
+local CudnnSeq2SeqDecoder, Parent = torch.class('znn.CudnnSeq2SeqDecoder', 'nn.Container')
 
 function CudnnSeq2SeqDecoder:__init( net, generateLen, out2in )
 
     Parent.__init(self)
 
     self.net = net
+    self.modules = { net }
     self.generateLen = generateLen
-
-    self.output = torch.Tensor()
 
     if out2in then
         assert( type(out2in) == "function", "out2in shall be a function" )
@@ -30,8 +29,7 @@ function CudnnSeq2SeqDecoder:updateOutput(input)
 
     if self.train then
 
-        local o = net:forward(input)
-
+        local o = net:updateOutput(input)
         self.output = o
 
     else
@@ -51,10 +49,16 @@ function CudnnSeq2SeqDecoder:updateOutput(input)
 end
 
 function CudnnSeq2SeqDecoder:backward(input, gradOutput)
-    self.net:backward( input, gradOutput )
+    self.gradInput = self.net:backward( input, gradOutput )
+    return self.gradInput
 end
 
 function CudnnSeq2SeqDecoder:updateGradInput(input, gradOutput)
-    self.net:updateGradInput(input, gradOutput)
+    self.gradInput = self.net:updateGradInput(input, gradOutput)
+    return self.gradInput
 end
 
+function CudnnSeq2SeqDecoder:accGradParameters(input, gradOutput, scale)
+    self.net:accGradParameters(input, gradOutput, scale)
+    return self
+end
