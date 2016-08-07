@@ -1,6 +1,6 @@
 local CudnnSeq2SeqDecoder, Parent = torch.class('znn.CudnnSeq2SeqDecoder', 'nn.Module')
 
-function CudnnSeq2SeqDecoder:__init( net, generateLen )
+function CudnnSeq2SeqDecoder:__init( net, generateLen, out2in )
 
     Parent.__init(self)
 
@@ -9,6 +9,15 @@ function CudnnSeq2SeqDecoder:__init( net, generateLen )
 
     self.output = torch.Tensor()
 
+    if out2in then
+        assert( type(out2in) == "function", "out2in shall be a function" )
+        self.out2in = out2in
+    end
+
+end
+
+function CudnnSeq2SeqDecoder:setLength(length)
+    self.generateLen = length
 end
 
 function CudnnSeq2SeqDecoder:out2in(output)
