@@ -29,7 +29,8 @@ local files = {
     'SeqSetPaddedValue',
     'CudnnGenerativeWrapper',
     'CudnnGetStatesWrapper',
-    'AdaptedLengthCriterion'
+    'AdaptedLengthCriterion',
+    'Linear'
 }
 
 for _, file in ipairs(files) do

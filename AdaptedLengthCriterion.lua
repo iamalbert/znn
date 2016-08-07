@@ -14,7 +14,7 @@ function AdaptedLengthCriterion:updateOutput( input, target )
     self.output = self.criterion:forward(
         input:narrow(1, 1, len) , 
         target:narrow(1, 1, len)
-    )
+    ) - input:size(1)  * self.lenp
 
     return self.output
 end

@@ -25,7 +25,7 @@ function CudnnGetStatesWrapper:updateGradInput(input, gradOutput)
     self.buffer = self.buffer or torch.CudaTensor()
     local buffer = self.buffer
 
-    buffer:resizeAs(input):zero()
+    buffer:resizeAs(rnn.output):zero()
 
     -- buffer[ input:size(1) ]:copy(gradOutput[1])
 
