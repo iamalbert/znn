@@ -27,10 +27,11 @@ local files = {
     'SeqPadding',
     'SeqTakeLast',
     'SeqSetPaddedValue',
-    'CudnnGenerativeWrapper',
+    'CudnnRNN',
+    'CudnnSeq2SeqDecoder',
     'CudnnGetStatesWrapper',
     'AdaptedLengthCriterion',
-    'Linear'
+    'Linear',
 }
 
 for _, file in ipairs(files) do
