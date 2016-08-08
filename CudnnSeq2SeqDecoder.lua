@@ -42,7 +42,7 @@ function CudnnSeq2SeqDecoder:updateOutput(input)
             input = self:out2in(outs[i])
         end
 
-        self.output = outs
+        self.output = znn.util.nestedJoin(outs)
     end
 
     return self.output

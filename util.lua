@@ -23,20 +23,21 @@ util.nestedJoin = function( list )
 
     local len = #list
 
-    local ret = znn.util.nestedMap( list[1], {}, function(old, new)
-        return old.new():resize( 
-            len, table.unpack(old:size():totable()) )
-    end)
+    local ret
+
+    local first = true
 
     for i, p in pairs(list) do
+        if first then
+            ret = znn.util.nestedMap( p, {}, function(old, new)
+                return old.new():resize( 
+                    len, table.unpack(old:size():totable()) )
+            end)
+            first = false
+        end
+
         znn.util.nestedMap( p, ret, function(old, new)
             local dest = new[i]
-
-            --[[
-            local ns = table.concat(dest:size():totable(), 'x')
-            local os = table.concat(old:size():totable(), 'x')
-            --]]
-
             dest:copy(old)
         end)
     end
