@@ -43,11 +43,12 @@ local function setOutputs(seq, hid, cell)
     end
 end
 
-local CudnnRNN, Module = torch.class('znn.CudnnRNN', 'nn.Module')
+local CudnnRNN, Parent = torch.class('znn.CudnnRNN', 'nn.Container')
 
 function CudnnRNN:__init(rnn)
-    Module.__init(self)
+    Parent.__init(self)
     assert( torch.isTypeOf(rnn, RNN), "expect an instance of cudnn.RNN")
+    self.modules = {rnn}
     self.rnn = rnn
 end
 
@@ -55,9 +56,11 @@ function CudnnRNN:updateOutput(input)
     local rnn = self.rnn
     local inputSeq, initHidden, initCell = getInputs(input)
 
+    -- print{ inseq=inputSeq, initH=initHidden, initC=initCell }
+
 
     rnn.hiddenInput = initHidden
-    rnn.initCell    = initCell
+    rnn.cellInput   = initCell
 
     rnn:forward(inputSeq)
 
@@ -78,7 +81,7 @@ function CudnnRNN:updateGradInput(input, gradOutput)
 
 
     rnn.hiddenInput = initHidden
-    rnn.initCell    = initCell
+    rnn.cellInput   = initCell
 
     rnn.gradHiddenOutput = gradHidden
     rnn.gradCellOutput   = gradCell
@@ -112,3 +115,10 @@ function CudnnRNN:accGradParameters(input, gradOutput, scale)
 
     return self
 end
+
+
+local LSTM, Parent = torch.class('znn.CudnnLSTM', 'znn.CudnnRNN')
+function LSTM:__init(...)
+    Parent.__init( self, cudnn.LSTM(...) )
+end
+
