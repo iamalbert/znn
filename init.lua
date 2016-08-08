@@ -23,6 +23,7 @@ do
 end
 
 local files = {
+    'util',
     'SeqBatchLength',
     'SeqPadding',
     'SeqTakeLast',
@@ -32,6 +33,7 @@ local files = {
     'CudnnGetStatesWrapper',
     'AdaptedLengthCriterion',
     'Linear',
+    'Sub'
 }
 
 for _, file in ipairs(files) do
