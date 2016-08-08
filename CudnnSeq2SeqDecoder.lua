@@ -37,7 +37,7 @@ function CudnnSeq2SeqDecoder:updateOutput(input)
         local generateLen = self.generateLen
 
         for i = 1, generateLen do
-            outs[i] = net:forward( input )
+            outs[i] = nn.utils.recursiveCopy({}, net:forward( input ) )
 
             input = self:out2in(outs[i])
         end
