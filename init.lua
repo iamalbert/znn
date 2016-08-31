@@ -33,7 +33,8 @@ local files = {
     'CudnnGetStatesWrapper',
     'AdaptedLengthCriterion',
     'Linear',
-    'Sub'
+    'Sub',
+    'GetTableField'
 }
 
 for _, file in ipairs(files) do
