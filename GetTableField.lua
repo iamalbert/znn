@@ -10,7 +10,6 @@ function GetTableField:__init( k1, k2, k3, k4 )
   self.k4 = k4
 
   self.output = nil
-  self.gradInput = nil
 end
 
 function GetTableField:updateOutput( input )
@@ -25,5 +24,5 @@ end
 
 function GetTableField:clearStates()
   self.output = nil
-  self.gradInput = nil
+  self.gradInput:set()
 end

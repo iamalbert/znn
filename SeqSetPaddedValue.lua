@@ -59,7 +59,7 @@ function SeqSetPaddedValue:updateGradInput(input, gradOutput)
     return self.gradInput
 end
 
-function SeqSetPaddedValue:clearStates()
+function SeqSetPaddedValue:clearState()
   self.output:set()
   self.gradInput[1]:set()
   return self

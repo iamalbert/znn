@@ -28,6 +28,7 @@ local files = {
     'SeqPadding',
     'SeqTakeLast',
     'SeqSetPaddedValue',
+    'SeqSetPaddedTargetDim',
     'CudnnRNN',
     'CudnnSeq2SeqDecoder',
     'CudnnGetStatesWrapper',
