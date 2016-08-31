@@ -34,7 +34,10 @@ local files = {
     'AdaptedLengthCriterion',
     'Linear',
     'Sub',
-    'GetTableField'
+    'GetTableField',
+
+    'CrossEntropyCriterion'
+
 }
 
 for _, file in ipairs(files) do
