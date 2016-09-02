@@ -11,7 +11,7 @@ require 'znn'
 function test.SeqTakeLast()
     -- add test code here, using tester:eq methods
 
-    local dim = 50
+    local dim = 10
     local len = { 10, 5, 32, 17, 24 }
 
     local length = torch.LongTensor(len)

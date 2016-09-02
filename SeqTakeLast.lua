@@ -16,21 +16,21 @@ end
 
 function SeqTakeLast:updateOutput(input)
     local seq, length = input[1], input[2]
-    -- assume seqLen x batch x dimension
 
     if self.batchfirst then
         seq = seq:transpose(1,2)
     end
+    local seqLen, bSize, dim = seq:size(1), seq:size(2), seq:size(3)
+
+    assert( length:size(1) == bSize,
+        "length not match:" .. bSize .. "/" .. length:size(1) )
+
 
     self.output = self.output or seq.new()
-    self.output:typeAs(seq):resize(seq:size(2), seq:size(3))
+    self.output:typeAs(seq):resize(bSize, dim)
 
-    assert( length:size(1) == seq:size(2), 
-        "length not match:" .. seq:size(2) .. "/" .. length:size(1) )
-
-    for i = 1, length:size(1) do
-        self.output[i]:copy( seq[{length[i], i}] )
-    end
+    self.output:view(1, bSize, dim):gather( 
+      seq, 1, length:view(1, bSize, 1):expand(1,bSize,dim) )
 
     return self.output
 end
@@ -41,18 +41,24 @@ function SeqTakeLast:updateGradInput(input, gradOutput)
     if self.batchfirst then
         seq = seq:transpose(1,2)
     end
+    local seqLen, bSize, dim = seq:size(1), seq:size(2), seq:size(3)
 
     self.gradInput[1] = self.gradInput[1] or seq.new()
 
-    local gradInput = self.gradInput[1]
-    gradInput:typeAs(seq):resizeAs(seq):zero()
-
-    assert( length:size(1) == seq:size(2), "length not match")
+    assert( length:size(1) == bSize,  "length not match")
     assert( length:size(1) == gradOutput:size(1), "length not match")
 
-    for i = 1, length:size(1) do
-        gradInput[{length[i], i}]:copy(gradOutput[i])
-    end
+    local gradInput = self.gradInput[1]
+    gradInput:resizeAs(seq):zero()
+
+    -- gI: seqLen x bSize x dim 
+    -- gO: bSize  x dim
+
+    gradInput:scatter(
+      1, 
+      length:view(1, bSize, 1):expand(1,bSize,dim),
+      gradOutput:view(1, bSize, dim):expand( seqLen, bSize, dim )
+    )
 
     self.gradInput[2]:resize(length:size()):zero()
 
