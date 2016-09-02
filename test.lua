@@ -1,54 +1,47 @@
+#!/usr/bin/env th
+
+local test = torch.TestSuite()
+
+local tester = torch.Tester()
+
+
 require 'cudnn'
 require 'znn'
 
-local m = znn.CudnnGetStatesWrapper( cudnn.LSTM(5, 5, 1) )
-local input = torch.rand(7, 2, 5):cuda()
-local gradOutput = {
-    torch.rand(1, 2, 5):cuda(),
-    torch.rand(1, 2, 5):cuda(),
-}
+function test.SeqTakeLast()
+    -- add test code here, using tester:eq methods
+
+    local dim = 50
+    local len = { 10, 5, 32, 17, 24 }
+
+    local length = torch.LongTensor(len)
+    local batchSize, maxLen = length:size(1), length:max()
+    local seq = torch.rand( maxLen, batchSize, dim )
+
+    local gradOutput = torch.rand( batchSize, dim )
+
+    local targetGradInput = torch.zeros(maxLen, batchSize, dim)
+    local target = torch.Tensor( batchSize, dim )
+    for i = 1, batchSize do
+      target[i]:copy( seq[{ len[i] , i }] )
+      targetGradInput[{len[i], i}]:copy(gradOutput[i])
+    end
 
 
-local pred = m:forward(input)
-local gradInput = m:backward(input, gradOutput)
---[[
-print{
-    pred = pred,
-    grad = gradInput
-}
-print( gradInput )
+    local input = { seq, length }
 
-local len = 4
-local bs = 2
-local nLayer = 2
-local rnn  = znn.CudnnLSTM(5, 5, nLayer)
-local m = znn.CudnnSeq2SeqDecoder( rnn, len+2 )
+    local m = znn.SeqTakeLast()
 
-m:training()
+    local pred = m:forward(input)
 
-local p1 = m:forward( torch.rand(len, bs, 5):cuda() )
-print(p1)
+    tester:assertTensorEq( pred, target, "forward error")
+    --- 
 
-print("--")
-local p1 = m:forward {
-    torch.rand(nLayer, bs, 5):cuda(),
-    torch.rand(len, bs, 5):cuda(),
-}
-print(p1[1])
-print(p1[2])
+    local predGradInput = m:backward( input, gradOutput )
+    tester:assertTensorEq( predGradInput[1], targetGradInput, 
+      "backward error")
+end
 
-print("--")
-m:evaluate()
-local p1 = m:forward( torch.rand(1, bs, 5):cuda() )
-print(p1)
 
-local p1 = m:forward {
-    torch.rand(nLayer, bs, 5):cuda(),
-    torch.rand(1, bs, 5):cuda(),
-}
-print(p1)
---]]
 
-local p =  torch.rand(3,4,5,6):split(1) 
-print(p)
-print( znn.util.nestedJoin(p) )
+return tester:add(test):run()

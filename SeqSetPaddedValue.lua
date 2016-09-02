@@ -7,7 +7,7 @@ function SeqSetPaddedValue:__init(value, inplace)
     self.value = value
     self.inplace = not not inplace 
 
-    self.gradInput = { self.gradInput }
+    self.gradInput = { self.gradInput, torch.Tensor() }
 end
 
 local fillPaddedValue = function(seq, length, dest, value)
@@ -56,11 +56,14 @@ function SeqSetPaddedValue:updateGradInput(input, gradOutput)
 
     fillPaddedValue( seq, length, gradInput, 0 )
 
+    self.gradInput[2]:resizeAs(length):zero()
+
     return self.gradInput
 end
 
 function SeqSetPaddedValue:clearState()
   self.output:set()
   self.gradInput[1]:set()
+  self.gradInput[2]:set()
   return self
 end

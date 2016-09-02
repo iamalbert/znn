@@ -4,12 +4,13 @@ function SeqTakeLast:__init(batchfirst)
     Module.__init(self)
     self.batchfirst = not not batchfirst
 
-    self.gradInput = { self.gradInput }
+    self.gradInput = { self.gradInput, torch.Tensor() }
 end
 
 function SeqTakeLast:clearState()
     self.output:set()
     self.gradInput[1]:set()
+    self.gradInput[2]:set()
     return self
 end
 
@@ -52,6 +53,8 @@ function SeqTakeLast:updateGradInput(input, gradOutput)
     for i = 1, length:size(1) do
         gradInput[{length[i], i}]:copy(gradOutput[i])
     end
+
+    self.gradInput[2]:resize(length:size()):zero()
 
     return self.gradInput
 end
