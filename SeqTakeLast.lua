@@ -27,10 +27,15 @@ function SeqTakeLast:updateOutput(input)
 
 
     self.output = self.output or seq.new()
-    self.output:typeAs(seq):resize(bSize, dim)
+    self.output:resize(bSize, dim)
 
-    self.output:view(1, bSize, dim):gather( 
-      seq, 1, length:view(1, bSize, 1):expand(1,bSize,dim) )
+    self.output
+      :view(1, bSize, dim)
+      :gather( 
+        seq, 
+        1, 
+        length:view(1, bSize, 1):expand(1,bSize,dim) 
+      )
 
     return self.output
 end
@@ -56,7 +61,7 @@ function SeqTakeLast:updateGradInput(input, gradOutput)
 
     gradInput:scatter(
       1, 
-      length:view(1, bSize, 1):expand(1,bSize,dim),
+      length:view(1,bSize,1):expand(seqLen,bSize,dim),
       gradOutput:view(1, bSize, dim):expand( seqLen, bSize, dim )
     )
 
